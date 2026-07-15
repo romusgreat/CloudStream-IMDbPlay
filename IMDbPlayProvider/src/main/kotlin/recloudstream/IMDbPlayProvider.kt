@@ -4,8 +4,10 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.AppUtils.tryParseJson
 import com.lagradost.cloudstream3.utils.ExtractorLink
+import com.lagradost.cloudstream3.utils.ExtractorLinkType
 import com.lagradost.cloudstream3.utils.Qualities
 import com.lagradost.cloudstream3.utils.StringUtils.encodeUri
+import com.lagradost.cloudstream3.utils.newExtractorLink
 
 class IMDbPlayProvider : MainAPI() {
     override var name = "IMDbPlay"
@@ -78,12 +80,11 @@ class IMDbPlayProvider : MainAPI() {
             for (season in 1..5) {
                 for (ep in 1..24) {
                     episodesList.add(
-                        Episode(
-                            data = "$imdbId|$season|$ep",
-                            name = "Season $season Episode $ep",
-                            season = season,
-                            episode = ep
-                        )
+                        newEpisode("$imdbId|$season|$ep") {
+                            this.name = "Season $season Episode $ep"
+                            this.season = season
+                            this.episode = ep
+                        }
                     )
                 }
             }
@@ -136,14 +137,15 @@ class IMDbPlayProvider : MainAPI() {
             
             if (streamUrl != null) {
                 callback.invoke(
-                    ExtractorLink(
-                        source = "GarageBand CDN",
-                        name = "GarageBand CDN",
-                        url = streamUrl,
-                        referer = "https://cloudorchestranova.com/",
-                        quality = Qualities.Unknown.value,
-                        isM3u8 = true
-                    )
+                    newExtractorLink(
+                        "GarageBand CDN",
+                        "GarageBand CDN",
+                        streamUrl
+                    ) {
+                        this.referer = "https://cloudorchestranova.com/"
+                        this.type = ExtractorLinkType.M3U8
+                        this.quality = Qualities.Unknown.value
+                    }
                 )
                 return true
             }
