@@ -1,5 +1,6 @@
 package recloudstream
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.AppUtils.tryParseJson
@@ -20,10 +21,12 @@ class IMDbPlayProvider : MainAPI() {
         TvType.TvSeries
     )
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     data class ImdbSuggestResponse(
         @JsonProperty("d") val d: List<ImdbSuggestItem>? = null
     )
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     data class ImdbSuggestItem(
         @JsonProperty("id") val id: String? = null,
         @JsonProperty("l") val l: String? = null,
@@ -48,19 +51,20 @@ class IMDbPlayProvider : MainAPI() {
                         val isTv = item.qid == "tvSeries" || item.qid == "tvMiniSeries" || item.q == "tvSeries" || item.q == "tvMiniSeries" || item.q?.contains("TV", ignoreCase = true) == true
                         val poster = item.i?.getOrNull(0)?.toString() ?: ""
                         val type = if (isTv) TvType.TvSeries else TvType.Movie
+                        val fullUrl = "https://www.imdb.com/title/$query"
                         if (isTv) {
-                            listOf(newTvSeriesSearchResponse(title, query, type) { this.posterUrl = poster })
+                            listOf(newTvSeriesSearchResponse(title, fullUrl, type) { this.posterUrl = poster })
                         } else {
-                            listOf(newMovieSearchResponse(title, query, type) { this.posterUrl = poster })
+                            listOf(newMovieSearchResponse(title, fullUrl, type) { this.posterUrl = poster })
                         }
                     } else {
-                        listOf(newMovieSearchResponse("IMDb ID: $query", query, TvType.Movie))
+                        listOf(newMovieSearchResponse("IMDb ID: $query", "https://www.imdb.com/title/$query", TvType.Movie))
                     }
                 } else {
-                    listOf(newMovieSearchResponse("IMDb ID: $query", query, TvType.Movie))
+                    listOf(newMovieSearchResponse("IMDb ID: $query", "https://www.imdb.com/title/$query", TvType.Movie))
                 }
             } catch (e: Exception) {
-                listOf(newMovieSearchResponse("IMDb ID: $query", query, TvType.Movie))
+                listOf(newMovieSearchResponse("IMDb ID: $query", "https://www.imdb.com/title/$query", TvType.Movie))
             }
         }
 
@@ -81,13 +85,14 @@ class IMDbPlayProvider : MainAPI() {
             val isTv = item.qid == "tvSeries" || item.qid == "tvMiniSeries" || item.q == "tvSeries" || item.q == "tvMiniSeries" || item.q?.contains("TV", ignoreCase = true) == true
             val type = if (isTv) TvType.TvSeries else TvType.Movie
             val poster = item.i?.getOrNull(0)?.toString() ?: ""
+            val fullUrl = "https://www.imdb.com/title/$id"
             
             if (isTv) {
-                newTvSeriesSearchResponse(title, id, type) {
+                newTvSeriesSearchResponse(title, fullUrl, type) {
                     this.posterUrl = poster
                 }
             } else {
-                newMovieSearchResponse(title, id, type) {
+                newMovieSearchResponse(title, fullUrl, type) {
                     this.posterUrl = poster
                 }
             }
@@ -95,7 +100,11 @@ class IMDbPlayProvider : MainAPI() {
     }
 
     override suspend fun load(url: String): LoadResponse {
-        val imdbId = url
+        val imdbId = (if (url.contains("/title/")) {
+            url.substringAfter("/title/").substringBefore("/")
+        } else {
+            url.substringAfter("title/").substringBefore("/")
+        }).removeSuffix("/").trim()
         
         // 1. Fetch details from the Suggest API (fast and 100% reliable, no bot protection)
         val suggestUrl = "https://sg.media-imdb.com/suggests/t/$imdbId.json"
@@ -134,6 +143,7 @@ class IMDbPlayProvider : MainAPI() {
             // ignore
         }
         
+        val fullUrl = "https://www.imdb.com/title/$imdbId"
         return if (isTv) {
             val episodesList = mutableListOf<Episode>()
             for (season in 1..5) {
@@ -147,12 +157,12 @@ class IMDbPlayProvider : MainAPI() {
                     )
                 }
             }
-            newTvSeriesLoadResponse(title, imdbId, TvType.TvSeries, episodesList) {
+            newTvSeriesLoadResponse(title, fullUrl, TvType.TvSeries, episodesList) {
                 this.posterUrl = poster
                 this.plot = description
             }
         } else {
-            newMovieLoadResponse(title, imdbId, TvType.Movie, imdbId) {
+            newMovieLoadResponse(title, fullUrl, TvType.Movie, imdbId) {
                 this.posterUrl = poster
                 this.plot = description
             }
