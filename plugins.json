@@ -1,0 +1,137 @@
+[
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=www.dailymotion.com&sz=%size%",
+        "jarFileSize": 54496,
+        "fileHash": "sha256-722433091ea0c5280b99c24d87f5192c115be199c09aee90d610a6990567201b",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/romusgreat/CloudStream-IMDbPlay",
+        "fileSize": 12964,
+        "status": 1,
+        "authors": [
+            "Luna712"
+        ],
+        "tvTypes": [
+            "Others"
+        ],
+        "version": 4,
+        "internalName": "DailymotionProvider",
+        "jarUrl": "https://raw.githubusercontent.com/romusgreat/CloudStream-IMDbPlay/builds/DailymotionProvider.jar",
+        "description": "Watch content from Dailymotion",
+        "url": "https://raw.githubusercontent.com/romusgreat/CloudStream-IMDbPlay/builds/DailymotionProvider.cs3",
+        "name": "DailymotionProvider",
+        "jarHash": "sha256-aa62899c451151f77fb8839733247d2a06f428ceb2e90bd4468e5ab8fecf132e"
+    },
+    {
+        "iconUrl": "https://www.imdb.com/favicon.ico",
+        "jarFileSize": 60452,
+        "fileHash": "sha256-ff70f913a1f6358a07cb37bd39eb02165d8fa2c89336b3558ac46f2572aaed33",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/romusgreat/CloudStream-IMDbPlay",
+        "fileSize": 17368,
+        "status": 1,
+        "authors": [
+            "Antigravity"
+        ],
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "version": 1,
+        "internalName": "IMDbPlayProvider",
+        "jarUrl": "https://raw.githubusercontent.com/romusgreat/CloudStream-IMDbPlay/builds/IMDbPlayProvider.jar",
+        "description": "Play movies and TV shows directly from IMDb",
+        "url": "https://raw.githubusercontent.com/romusgreat/CloudStream-IMDbPlay/builds/IMDbPlayProvider.cs3",
+        "name": "IMDbPlayProvider",
+        "jarHash": "sha256-9eeea341daae2639d8faeb8ffe916ac12276971751a0bf2bf0d02fed35d67ce7"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=archive.org&sz=%size%",
+        "jarFileSize": 130049,
+        "fileHash": "sha256-0ce8f0efa6911aafe3afc18340d5cc0813a7e4da9e00a47830bb64e3a54e2efb",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/romusgreat/CloudStream-IMDbPlay",
+        "fileSize": 29424,
+        "status": 1,
+        "authors": [
+            "Luna712"
+        ],
+        "tvTypes": [
+            "Others"
+        ],
+        "version": 1,
+        "internalName": "InternetArchiveProvider",
+        "jarUrl": "https://raw.githubusercontent.com/romusgreat/CloudStream-IMDbPlay/builds/InternetArchiveProvider.jar",
+        "description": "Watch content from the Internet Archive at archive.org",
+        "url": "https://raw.githubusercontent.com/romusgreat/CloudStream-IMDbPlay/builds/InternetArchiveProvider.cs3",
+        "name": "InternetArchiveProvider",
+        "jarHash": "sha256-6b9b7974f94811a0d16ae2d3748cf52da19f142b963ceb5a58408214716c8b73"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=invidious.io&sz=%size%",
+        "jarFileSize": 68266,
+        "fileHash": "sha256-1f40aaa92351acb5d7ee0ce13e7caa0625ad40afb9853e7cdf5d18ee3bd6ce0e",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/romusgreat/CloudStream-IMDbPlay",
+        "fileSize": 15286,
+        "status": 1,
+        "authors": [
+            "Cloudburst"
+        ],
+        "tvTypes": [
+            "Others"
+        ],
+        "version": 9,
+        "internalName": "InvidiousProvider",
+        "jarUrl": "https://raw.githubusercontent.com/romusgreat/CloudStream-IMDbPlay/builds/InvidiousProvider.jar",
+        "description": "Watch content from any invidious instance",
+        "url": "https://raw.githubusercontent.com/romusgreat/CloudStream-IMDbPlay/builds/InvidiousProvider.cs3",
+        "name": "InvidiousProvider",
+        "jarHash": "sha256-a5f8410fe3711b6769e5d97bb9244d751f5f6ac78d33242c1723b58a0199207f"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=twitch.tv&sz=%size%",
+        "jarFileSize": 56997,
+        "fileHash": "sha256-a7cc95f77bbd00a311d122201c63babe70b63fb398641fa28bf2b2c77346150a",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/romusgreat/CloudStream-IMDbPlay",
+        "fileSize": 15239,
+        "status": 1,
+        "authors": [
+            "CranberrySoup"
+        ],
+        "tvTypes": [
+            "Live"
+        ],
+        "version": 2,
+        "internalName": "TwitchProvider",
+        "jarUrl": "https://raw.githubusercontent.com/romusgreat/CloudStream-IMDbPlay/builds/TwitchProvider.jar",
+        "description": "Watch livestreams from Twitch",
+        "url": "https://raw.githubusercontent.com/romusgreat/CloudStream-IMDbPlay/builds/TwitchProvider.cs3",
+        "name": "TwitchProvider",
+        "jarHash": "sha256-88086809ed6ccc21cca611ce2ba4f2563b1082486ffda3daa6350da9126b548b"
+    },
+    {
+        "iconUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/YouTube_full-color_icon_%282017%29.svg/3840px-YouTube_full-color_icon_%282017%29.svg.png",
+        "jarFileSize": 46472,
+        "fileHash": "sha256-a246eb1584cec9e69ba8c50136b9e8dc11a2fc0ab225710c31ad66c2ec4f4efe",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/romusgreat/CloudStream-IMDbPlay",
+        "fileSize": 13152,
+        "status": 1,
+        "authors": [
+            "KaifTaufiq"
+        ],
+        "tvTypes": [
+            "Other",
+            "Live",
+            "TvSeries"
+        ],
+        "version": 1,
+        "internalName": "YoutubeProvider",
+        "jarUrl": "https://raw.githubusercontent.com/romusgreat/CloudStream-IMDbPlay/builds/YoutubeProvider.jar",
+        "description": "Watch Youtube in Cloudstream",
+        "url": "https://raw.githubusercontent.com/romusgreat/CloudStream-IMDbPlay/builds/YoutubeProvider.cs3",
+        "name": "YoutubeProvider",
+        "jarHash": "sha256-0d83e79f196464e50b8b1aa4c13683b2428fc3556651a0d190981c1149b3ea41"
+    }
+]
