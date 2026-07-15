@@ -9,6 +9,7 @@ import com.lagradost.cloudstream3.utils.ExtractorLinkType
 import com.lagradost.cloudstream3.utils.Qualities
 import com.lagradost.cloudstream3.utils.StringUtils.encodeUri
 import com.lagradost.cloudstream3.utils.newExtractorLink
+import com.lagradost.cloudstream3.utils.loadExtractor
 
 class IMDbPlayProvider : MainAPI() {
     override var name = "IMDbPlay"
@@ -181,44 +182,11 @@ class IMDbPlayProvider : MainAPI() {
         val embedUrl = if (parts.size > 1) {
             val season = parts[1].toIntOrNull() ?: 1
             val episode = parts[2].toIntOrNull() ?: 1
-            "https://proxy.garageband.rocks/embed/tv/$imdbId?season=$season&episode=$episode&autonext=1"
+            "https://vidsrc.to/embed/tv/$imdbId/$season/$episode"
         } else {
-            "https://proxy.garageband.rocks/embed/movie/$imdbId"
+            "https://vidsrc.to/embed/movie/$imdbId"
         }
 
-        val response = app.get(embedUrl, headers = mapOf("Referer" to "https://www.imdb.com/")).document
-        val iframeSrc = response.select("iframe#player_iframe").attr("src")
-        
-        if (iframeSrc.isNotEmpty()) {
-            val fullIframeUrl = if (iframeSrc.startsWith("//")) "https:$iframeSrc" else iframeSrc
-            
-            val playerDoc = app.get(
-                fullIframeUrl, 
-                headers = mapOf(
-                    "Referer" to embedUrl,
-                    "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
-                )
-            ).text
-            
-            val m3u8Regex = """file\s*:\s*["'](https?://[^"']+\.m3u8[^"']*)["']""".toRegex()
-            val match = m3u8Regex.find(playerDoc)
-            val streamUrl = match?.groups?.get(1)?.value
-            
-            if (streamUrl != null) {
-                callback.invoke(
-                    newExtractorLink(
-                        "GarageBand CDN",
-                        "GarageBand CDN",
-                        streamUrl
-                    ) {
-                        this.referer = "https://cloudorchestranova.com/"
-                        this.type = ExtractorLinkType.M3U8
-                        this.quality = Qualities.Unknown.value
-                    }
-                )
-                return true
-            }
-        }
-        return false
+        return loadExtractor(embedUrl, subtitleCallback, callback)
     }
 }
