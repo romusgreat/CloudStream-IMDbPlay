@@ -28,16 +28,40 @@ class IMDbPlayProvider : MainAPI() {
         @JsonProperty("id") val id: String? = null,
         @JsonProperty("l") val l: String? = null,
         @JsonProperty("q") val q: String? = null,
+        @JsonProperty("qid") val qid: String? = null,
         @JsonProperty("i") val i: List<Any>? = null
     )
 
     override suspend fun search(query: String): List<SearchResponse> {
         if (query.startsWith("tt") && query.length >= 7) {
-            return listOf(
-                newMovieSearchResponse("IMDb ID: $query", query, TvType.Movie) {
-                    this.posterUrl = "https://www.imdb.com/favicon.ico"
+            val idUrl = "https://sg.media-imdb.com/suggests/t/$query.json"
+            return try {
+                val response = app.get(idUrl).text
+                val jsonStart = response.indexOf("(") + 1
+                val jsonEnd = response.lastIndexOf(")")
+                if (jsonStart > 0 && jsonEnd > jsonStart) {
+                    val rawJson = response.substring(jsonStart, jsonEnd)
+                    val data = tryParseJson<ImdbSuggestResponse>(rawJson)
+                    val item = data?.d?.firstOrNull()
+                    if (item != null) {
+                        val title = item.l ?: "IMDb ID: $query"
+                        val isTv = item.qid == "tvSeries" || item.qid == "tvMiniSeries" || item.q == "tvSeries" || item.q == "tvMiniSeries" || item.q?.contains("TV", ignoreCase = true) == true
+                        val poster = item.i?.getOrNull(0)?.toString() ?: ""
+                        val type = if (isTv) TvType.TvSeries else TvType.Movie
+                        if (isTv) {
+                            listOf(newTvSeriesSearchResponse(title, query, type) { this.posterUrl = poster })
+                        } else {
+                            listOf(newMovieSearchResponse(title, query, type) { this.posterUrl = poster })
+                        }
+                    } else {
+                        listOf(newMovieSearchResponse("IMDb ID: $query", query, TvType.Movie))
+                    }
+                } else {
+                    listOf(newMovieSearchResponse("IMDb ID: $query", query, TvType.Movie))
                 }
-            )
+            } catch (e: Exception) {
+                listOf(newMovieSearchResponse("IMDb ID: $query", query, TvType.Movie))
+            }
         }
 
         val firstLetter = query.take(1).lowercase()
@@ -54,26 +78,61 @@ class IMDbPlayProvider : MainAPI() {
         return data?.d?.mapNotNull { item ->
             val id = item.id ?: return@mapNotNull null
             val title = item.l ?: return@mapNotNull null
-            val isTv = item.q == "tvSeries" || item.q == "tvMiniSeries"
+            val isTv = item.qid == "tvSeries" || item.qid == "tvMiniSeries" || item.q == "tvSeries" || item.q == "tvMiniSeries" || item.q?.contains("TV", ignoreCase = true) == true
             val type = if (isTv) TvType.TvSeries else TvType.Movie
             val poster = item.i?.getOrNull(0)?.toString() ?: ""
             
-            newMovieSearchResponse(title, id, type) {
-                this.posterUrl = poster
+            if (isTv) {
+                newTvSeriesSearchResponse(title, id, type) {
+                    this.posterUrl = poster
+                }
+            } else {
+                newMovieSearchResponse(title, id, type) {
+                    this.posterUrl = poster
+                }
             }
         } ?: emptyList()
     }
 
     override suspend fun load(url: String): LoadResponse {
         val imdbId = url
-        val docUrl = "https://www.imdb.com/title/$imdbId/"
-        val document = app.get(docUrl, headers = mapOf("User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64)")).document
         
-        val title = document.select("h1").text() ?: "Unknown Title"
-        val poster = document.select("meta[property=og:image]").attr("content")
-        val description = document.select("meta[property=og:description]").attr("content")
-        val ogType = document.select("meta[property=og:type]").attr("content")
-        val isTv = ogType == "video.tv_show"
+        // 1. Fetch details from the Suggest API (fast and 100% reliable, no bot protection)
+        val suggestUrl = "https://sg.media-imdb.com/suggests/t/$imdbId.json"
+        var title = "Unknown Title"
+        var poster = ""
+        var isTv = false
+        
+        try {
+            val response = app.get(suggestUrl).text
+            val jsonStart = response.indexOf("(") + 1
+            val jsonEnd = response.lastIndexOf(")")
+            if (jsonStart > 0 && jsonEnd > jsonStart) {
+                val rawJson = response.substring(jsonStart, jsonEnd)
+                val data = tryParseJson<ImdbSuggestResponse>(rawJson)
+                val item = data?.d?.firstOrNull()
+                if (item != null) {
+                    title = item.l ?: "Unknown Title"
+                    poster = item.i?.getOrNull(0)?.toString() ?: ""
+                    isTv = item.qid == "tvSeries" || item.qid == "tvMiniSeries" || item.q == "tvSeries" || item.q == "tvMiniSeries" || item.q?.contains("TV", ignoreCase = true) == true
+                }
+            }
+        } catch (e: Exception) {
+            // ignore and fallback
+        }
+        
+        // 2. Fetch plot description from the HTML page (wrapped in try-catch)
+        var description = "No Plot Found"
+        try {
+            val docUrl = "https://www.imdb.com/title/$imdbId/"
+            val document = app.get(docUrl, headers = mapOf("User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64)")).document
+            val scrapedDesc = document.select("meta[property=og:description]").attr("content")
+            if (scrapedDesc.isNotEmpty()) {
+                description = scrapedDesc
+            }
+        } catch (e: Exception) {
+            // ignore
+        }
         
         return if (isTv) {
             val episodesList = mutableListOf<Episode>()
